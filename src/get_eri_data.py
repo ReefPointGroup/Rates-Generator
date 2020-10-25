@@ -16,6 +16,19 @@ import time, shutil, os
 url = 'https://online.erieri.com/Account/Login'
 ar_url = 'https://online.erieri.com/SA/AdvancedReports/'
 
+if os.path.exists('auth/upass.txt'):
+    with open('auth/upass.txt', 'r') as inf:
+        upass = eval(inf.read())
+else:
+    uname = input('Please enter ERI Email:')
+    pword = input('Please enter ERI password:')
+    upass = {'username': uname, 
+             'password': pword}
+    f = open('auth/upass.txt', 'w')
+    f.write(str(upass))
+    f.close()
+
+
 #Lazy find_element_by_xpath
 def f_xpath(driver, xpath):
     loc = driver.find_element_by_xpath(xpath)
@@ -23,10 +36,10 @@ def f_xpath(driver, xpath):
 
 
 #Reads the upass file created, starts driver, logs in 
-def eri_login(url):
-    f=pd.read_csv('auth/upass.txt', sep=',', header=None, index_col=None)
-    usr = f.iloc[0][0].strip()
-    pword = f.iloc[0][1].strip()
+def eri_login(url, upass):
+
+    usr = upass['username']
+    pword = upass['password']
 
     driver = webdriver.Chrome('driver/chromedriver.exe')
     driver.get(url)
@@ -41,9 +54,9 @@ def eri_login(url):
 
 
 #downoads advanced report for saved job titles
-def get_advanced_report(url, ar_url):
+def get_advanced_report(url, ar_url, upass):
 
-    driver = eri_login(url)
+    driver = eri_login(url, upass)
     driver.get(ar_url)
     time.sleep(3)
     f_xpath(driver, '//*[@id="Toolbar #btnExcelExport"]/i').click()
@@ -94,6 +107,6 @@ def wrangle_eri():
     df.to_csv('data/eri/processed/ERI_Rates.csv')
 
 
-get_advanced_report(url, ar_url)
+get_advanced_report(url, ar_url, upass)
 move_from_downloads('AdvancedJobReport')
 wrangle_eri()

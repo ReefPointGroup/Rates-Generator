@@ -40,10 +40,7 @@ job_list = ['Senior Data Architect',
             'Data Engineer', 
             'Data Science Consultant', 
             'Senior Data Scientist', 
-            'Data Scientist', 
-            'Subject Matter Expert 1', 
-            'Subject Matter Expert 2', 
-            'Subject Matter Expert 3']
+            'Data Scientist']
 
 #Lazy find_element_by_xpath
 def f_xpath(driver, xpath):
@@ -52,6 +49,7 @@ def f_xpath(driver, xpath):
 
 def gd_signin (driver, upass):
     driver.get('https://www.glassdoor.com/index.htm')
+    time.sleep(1)
     f_xpath(driver, '//*[@id="TopNav"]/nav/div/div/div[4]/div[1]/a').click()
     f_xpath(driver, '//*[@id="userEmail"]').send_keys(upass['username'])
     f_xpath(driver, '//*[@id="userPassword"]').send_keys(upass['password'])
@@ -61,6 +59,7 @@ def gd_signin (driver, upass):
 driver = webdriver.Chrome('driver/chromedriver.exe')
 
 gd_signin(driver, upass)
+time.sleep(2)
 driver.get(url)
 
 job_loc = 'Washington, DC'
@@ -73,6 +72,7 @@ for title in job_list:
     f_xpath(driver, '//*[@id="LocationSearch"]').clear()
     f_xpath(driver, '//*[@id="LocationSearch"]').send_keys(job_loc)
     f_xpath(driver, '//*[@id="HeroSearchButton"]').click()
+    driver.implicitly_wait(5)
     low = f_xpath(driver, '//*[@id="OccMedianChart"]/div[1]/div[2]/div/div[2]/div[1]').text
     avg = f_xpath(driver, '//*[@id="OccMedianChart"]/div[1]/div[2]/div/div[2]/div[4]').text
     high = f_xpath(driver, '//*[@id="OccMedianChart"]/div[1]/div[2]/div/div[2]/div[8]').text
@@ -80,3 +80,11 @@ for title in job_list:
     job_data[title] = {'low': low, 
                        'avg': avg, 
                        'high': high}
+
+driver.close()
+
+
+driver.find_element_by_class('')
+
+
+
