@@ -51,7 +51,7 @@ def f_xpath(driver, xpath):
     return(loc)
 
 def gd_signin (driver, upass):
-    driver.get('glassdoor.com/index.htm')
+    driver.get('https://www.glassdoor.com/index.htm')
     f_xpath(driver, '//*[@id="TopNav"]/nav/div/div/div[4]/div[1]/a').click()
     f_xpath(driver, '//*[@id="userEmail"]').send_keys(upass['username'])
     f_xpath(driver, '//*[@id="userPassword"]').send_keys(upass['password'])
@@ -59,6 +59,8 @@ def gd_signin (driver, upass):
 
 
 driver = webdriver.Chrome('driver/chromedriver.exe')
+
+gd_signin(driver, upass)
 driver.get(url)
 
 job_loc = 'Washington, DC'
