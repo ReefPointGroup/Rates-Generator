@@ -72,19 +72,24 @@ for title in job_list:
     f_xpath(driver, '//*[@id="LocationSearch"]').clear()
     f_xpath(driver, '//*[@id="LocationSearch"]').send_keys(job_loc)
     f_xpath(driver, '//*[@id="HeroSearchButton"]').click()
-    driver.implicitly_wait(5)
-    low = f_xpath(driver, '//*[@id="OccMedianChart"]/div[1]/div[2]/div/div[2]/div[1]').text
-    avg = f_xpath(driver, '//*[@id="OccMedianChart"]/div[1]/div[2]/div/div[2]/div[4]').text
-    high = f_xpath(driver, '//*[@id="OccMedianChart"]/div[1]/div[2]/div/div[2]/div[8]').text
+    time.sleep(3)
     
-    job_data[title] = {'low': low, 
-                       'avg': avg, 
-                       'high': high}
+    price_list = driver.find_elements_by_class_name('common__HistogramStyle__labelWrapper')
+    tier_dict = {}
+
+    for tier in price_list:
+
+        level = tier.text.split()
+
+        tier_dict[level[1]] = level[0]
+        
+    job_data[title] = tier_dict
 
 driver.close()
 
+gd_data = pd.DataFrame.from_dict(job_data, orient='index')
 
-driver.find_element_by_class('')
+if not os.path.exists('data/Glass_Door/raw/'):
+    os.makedirs('data/Glass_Door/raw/')
 
-
-
+gd_data.to_csv('data/glass_door/raw/GD_Rates.csv')
