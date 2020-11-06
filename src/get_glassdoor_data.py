@@ -8,6 +8,10 @@ Created on Sun Oct 25 16:15:54 2020
 from selenium import webdriver
 import pandas as pd
 import time, shutil, os
+import numpy as np
+from src.sql_connect import sql_connection
+from datetime import datetime
+
 
 if os.path.exists('auth/gd_upass.txt'):
     with open('auth/gd_upass.txt', 'r') as inf:
@@ -89,7 +93,49 @@ driver.close()
 
 gd_data = pd.DataFrame.from_dict(job_data, orient='index')
 
-if not os.path.exists('data/Glass_Door/raw/'):
-    os.makedirs('data/Glass_Door/raw/')
 
-gd_data.to_csv('data/glass_door/raw/GD_Rates.csv')
+##Processing
+
+def processing(col):
+
+    col = col.str.replace(r'$', '')
+    col = col.str.replace(r'K', '')
+    col = col.astype(float)
+    col = col.fillna(col.mean(axis=0))
+    col = col*1000
+    return(col)
+
+col_names = ['Low', 'Average', 'High']
+
+
+gd_data.loc[:, col_names] = gd_data.loc[:, col_names].apply(lambda x:processing(x), axis=1)
+
+gd_data = gd_data.rename(columns={'Unnamed: 0': 'LCAT'})
+gd_data['Pull_Date'] = datetime.today().strftime('%Y-%m-%d')
+
+
+cnxn = sql_connection()
+cursor = cnxn.cursor()
+
+for index, row in gd_data.iterrows():
+    cursor.execute("INSERT INTO Glassdoor_Rates (LCAT,Low,Average,High, Pull_Date) values(?,?,?,?,?)", row.LCAT, row.Low, row.Average, row.High, row.Pull_Date)
+cnxn.commit()
+
+cnxn.close()
+
+# Insert new data into sql server table
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

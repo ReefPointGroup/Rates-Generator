@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['src\\get_eri_data.py', 'src\\get_glassdoor_data.py']
+recent_files = ['src\\get_glassdoor_data.py']
 

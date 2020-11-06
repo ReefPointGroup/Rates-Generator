@@ -12,7 +12,9 @@ For initial running, make sure to create auth/upass.txt with username, password 
 from selenium import webdriver
 import pandas as pd
 import time, shutil, os
+from src.sql_connect import sql_connection
 
+cnxn = sql_connection()
 url = 'https://online.erieri.com/Account/Login'
 ar_url = 'https://online.erieri.com/SA/AdvancedReports/'
 
@@ -93,20 +95,27 @@ def move_from_downloads(fname):
     os.rename(os.path.join(dest, max_file), dest_file)
 
 
-def wrangle_eri():
+def wrangle_eri(df):
     
-    df = pd.read_excel('data/eri/raw/AdvancedJobReport.xlsx', 'Advanced Job Report', skiprows=7, usecols = 'A:L')
+    #place holder for data processing or wrangling
     
-    
-    
-    eri_loc = 'data/eri/processed/'
-    #saving space for wrangling
-    if not os.path.exists(eri_loc):
-        os.makedirs(eri_loc)
-        
-    df.to_csv('data/eri/processed/ERI_Rates.csv')
+    return(df)
 
 
 get_advanced_report(url, ar_url, upass)
 move_from_downloads('AdvancedJobReport')
+
+df = pd.read_excel('data/eri/raw/AdvancedJobReport.xlsx', 'Advanced Job Report', skiprows=7, usecols = 'A:L')
+
+df_proc = wrangle_eri(df)
+
+eri_loc = 'data/eri/processed/'
+
+if not os.path.exists(eri_loc):
+    os.makedirs(eri_loc)
+        
+df.to_csv('data/eri/processed/ERI_Rates.csv')
+
+
 wrangle_eri()
+cnxn.close()
