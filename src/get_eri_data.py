@@ -13,8 +13,8 @@ from selenium import webdriver
 import pandas as pd
 import time, shutil, os
 from src.sql_connect import sql_connection
+from datetime import datetime
 
-cnxn = sql_connection()
 url = 'https://online.erieri.com/Account/Login'
 ar_url = 'https://online.erieri.com/SA/AdvancedReports/'
 
@@ -118,4 +118,32 @@ df.to_csv('data/eri/processed/ERI_Rates.csv')
 
 
 wrangle_eri()
+
+
+def clean_data(df):
+    df = df.
+
+pd.set_option('display.max_columns', None)
+
+df = pd.read_csv('data/eri/processed/ERI_Rates.csv')
+df = df.dropna()
+df = df[df['Level'].str.contains('Experience')]
+df = df.iloc[:, 1:].reset_index(drop=True)
+df['Level'] = df['Level'].str.replace('Experience: ', '').astype('int')
+df['Pull_Date'] = datetime.today().strftime('%Y-%m-%d')
+df['Job Number'] = df['Job Number'].astype('str')
+df['eDOT'] = df['eDOT'].astype('int').astype('str')
+df['SOC'] = df['SOC'].astype('int').astype('str')
+cnxn = sql_connection()
+cursor = cnxn.cursor()
+
+for index, row in df.iterrows():
+    cursor.execute("INSERT INTO ERI_Rates (LCAT,Perc_10,Perc_25, Perc_50, Perc_75, Perc_90, Job_Num, eDot, SOC,Location , Pull_Date, Years_Experience) values(?,?,?,?,?,?,?,?,?,?,?,?)", \
+                   row['ERI Job Title'],row['10th Percentile'],row['25th Percentile'],row['ERI Survey Mean'],row['75th Percentile'],row['90th Percentile'],row['Job Number'], \
+                   row['eDOT'],row['SOC'],row['Geographic Area'],row['Pull_Date'], row['Level'])
+cnxn.commit()
+
+
+
+
 cnxn.close()
