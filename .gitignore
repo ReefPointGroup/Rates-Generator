@@ -2,5 +2,6 @@ test.txt
 upass.txt
 gd_upass.txt
 sql_cred.txt
-eri/
-Glass_Door/
+data/eri/
+data/Glass_Door/raw/
+data/Glass_Door/raw/GD_Rates.csv
