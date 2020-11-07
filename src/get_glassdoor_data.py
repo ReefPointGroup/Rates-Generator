@@ -59,7 +59,7 @@ def pull_gd_data():
     
     
     driver = webdriver.Chrome('driver/chromedriver.exe')
-    
+    driver.implicitly_wait(10)
     gd_signin(driver, upass)
     time.sleep(2)
     driver.get(url)

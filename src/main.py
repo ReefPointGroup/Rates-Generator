@@ -15,6 +15,9 @@ if eri_get == 'Y':
     eri.get_eri_data()
 
 if gd_get == 'Y':
-    gd.get_glassdoor_data()
+    try:
+        gd.pull_gd_data()
+    except:
+        gd.pull_gd_data()
     
 commit.commit_data()
