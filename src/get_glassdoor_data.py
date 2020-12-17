@@ -113,5 +113,20 @@ def pull_gd_data():
     gd_data = gd_data.reset_index()
     gd_data.columns = ['LCAT', 'Low', 'Average', 'High', 'Pull_Date']
     gd_data['25'] = (gd_data.Low+gd_data.Average)/2
-    gd_data['75'] = (gd_data.Average+gd_data.High)/2
+    gd_data['75'] = (gd_data.Average+gd_data.High)/
+    
     gd_data.to_csv('data/Glass_Door/raw/GD_Rates.csv')
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
