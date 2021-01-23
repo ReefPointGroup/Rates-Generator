@@ -36,3 +36,5 @@ comb_df = comb.bring_it_together(eri_df_raw, gd_df_raw)
 
 # Commit data from local to the SQL server -----------------------------------
 commit.commit_data(eri_df_raw, gd_df_raw, comb_df)
+
+comb_df.to_csv('data/combined.csv')

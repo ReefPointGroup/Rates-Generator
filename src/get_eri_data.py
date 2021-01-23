@@ -108,7 +108,7 @@ def get_eri_data():
     df['eDOT'] = df['eDOT'].astype('int').astype('str')
     df['SOC'] = df['SOC'].astype('int').astype('str')
     df = df[(df['ERI Job Title'] == 'Program Manager (Government Contractor)') | (~df['ERI Job Title'].str.contains('Program Manager'))]
-
+    df = df[df['Level'].notna()]
     
     job_ref = df.groupby(['ERI Job Title', 'SOC', 'eDOT']).mean()
     job_ref = job_ref.reset_index()
@@ -121,4 +121,4 @@ def get_eri_data():
     
     job_ref.to_csv('ref/job_ref.csv')
 
-
+    

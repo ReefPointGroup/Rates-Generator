@@ -41,10 +41,9 @@ def eri_processing(df):
     del df['Unnamed: 0']
 
 
+
     return(df)
 
-def comb_direct_rate(df_nums):
-    df_nums = df_nums/1920
 
 def bring_it_together(eri_df, gd_df):
     
@@ -53,14 +52,42 @@ def bring_it_together(eri_df, gd_df):
     
     lcat_table = eri_df[['eDOT', 'SOC', 'LCAT', 'Level']]
     
+    #Get the job numbers between eri and gd
     gd_df = pd.merge(gd_df, lcat_table, how='inner', on='LCAT')
     
     combined = gd_df.append(eri_df)
-    comb_dr = combined.select_dtypes(np.float64).apply(lambda x: x/1920)
-    comb_dr.columns = comb_dr.columns+'_dr'
-    test = pd.concat([combined, comb_dr], axis=1)
+    common_col = combined.select_dtypes(np.float64).columns
     
-    combined.select_dtypes(np.float64)
+    #Direct Rates
+    comb_dr = combined.select_dtypes(np.float64).apply(lambda x: x/1920)
+    comb_dr.columns = common_col+'_dr'
+
+    
+    #Indirect Rates
+    fringe = 0.34
+    overhead = 0.25
+    g_a = 0.146
+    profit = 0.18
+    
+    comb_ir = comb_dr.apply(lambda x: x*(1+fringe)*(1+overhead)*(1+g_a))
+    comb_ir.columns = common_col+'_ir'
+    
+    #Fully Burdened
+    
+    comb_fb = comb_ir.apply(lambda x: x*(1+profit))
+    comb_fb.columns = common_col+'_fb'
+    
+    combined = pd.concat([combined, comb_dr, comb_ir, comb_fb], axis = 1)
+    combined.reset_index(inplace=True, drop=True)
+    
+    combined = combined.melt(id_vars = ['LCAT', 'Pull_Date', 'Source', 'eDOT', 'SOC', 'Level'])
+    combined['Percentile'] = combined['variable'].map(lambda x: x[0:2])
+    combined['Rate Type'] = combined['variable'].map(lambda x: x[-2:])
+    combined['Rate Type'] = combined['Rate Type'].str.replace('rc', 'Annual Salary')
+    combined['Rate Type'] = combined['Rate Type'].str.replace('fb', 'Fully Burdened')
+    combined['Rate Type'] = combined['Rate Type'].str.replace('dr', 'Direct Rate')
+    combined['Rate Type'] = combined['Rate Type'].str.replace('ir', 'Indirect Rate')
+    
     
     return(combined)
 
